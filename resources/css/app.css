@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-navy: #022864;
+    --color-teal: #07979E;
+    --color-navy-50: #e8edf5;
+    --color-navy-100: #c5d1e8;
+    --color-navy-200: #9eb3d9;
+    --color-navy-300: #7795ca;
+    --color-navy-400: #5a7ebf;
+    --color-navy-500: #3d67b4;
+    --color-navy-600: #2a4f9a;
+    --color-navy-700: #1a3a7a;
+    --color-navy-800: #0c2658;
+    --color-navy-900: #022864;
+    --color-teal-50: #e6f5f6;
+    --color-teal-100: #b3e4e6;
+    --color-teal-200: #80d3d6;
+    --color-teal-300: #4dc2c6;
+    --color-teal-400: #26b5ba;
+    --color-teal-500: #07979E;
+    --color-teal-600: #06787e;
+    --color-teal-700: #04595e;
+    --color-teal-800: #033a3e;
+    --color-teal-900: #011b1e;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
