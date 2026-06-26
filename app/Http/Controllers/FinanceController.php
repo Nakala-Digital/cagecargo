@@ -162,31 +162,62 @@ class FinanceController extends Controller
 
     public function exportData(Request $request)
     {
-        $query = JobOrder::with(['customer', 'invoices', 'costs'])
-            ->whereIn('status', ['delivered', 'closed']);
+        $customers = Customer::where('status', 'aktif')->orderBy('nama')->get();
+        $type = $request->input('type', 'invoice');
 
-        if ($request->start_date) {
-            $query->whereDate('created_at', '>=', $request->start_date);
-        }
-        if ($request->end_date) {
-            $query->whereDate('created_at', '<=', $request->end_date);
-        }
-        if ($request->customer_id) {
-            $query->where('customer_id', $request->customer_id);
+        if ($type === 'cost') {
+            $query = Cost::with(['jobOrder.customer', 'vendor']);
+
+            if ($request->filled('from')) {
+                $query->whereDate('tanggal', '>=', $request->from);
+            }
+
+            if ($request->filled('to')) {
+                $query->whereDate('tanggal', '<=', $request->to);
+            }
+
+            if ($request->filled('customer_id')) {
+                $query->whereHas('jobOrder', function ($jobQuery) use ($request) {
+                    $jobQuery->where('customer_id', $request->customer_id);
+                });
+            }
+
+            $data = $query->latest('tanggal')->paginate(15)->withQueryString();
+        } elseif ($type === 'job') {
+            $query = JobOrder::with(['customer', 'armada'])
+                ->whereIn('status', ['delivered', 'closed']);
+
+            if ($request->filled('from')) {
+                $query->whereDate('created_at', '>=', $request->from);
+            }
+
+            if ($request->filled('to')) {
+                $query->whereDate('created_at', '<=', $request->to);
+            }
+
+            if ($request->filled('customer_id')) {
+                $query->where('customer_id', $request->customer_id);
+            }
+
+            $data = $query->latest()->paginate(15)->withQueryString();
+        } else {
+            $query = Invoice::with(['jobOrder', 'customer']);
+
+            if ($request->filled('from')) {
+                $query->whereDate('tanggal_invoice', '>=', $request->from);
+            }
+
+            if ($request->filled('to')) {
+                $query->whereDate('tanggal_invoice', '<=', $request->to);
+            }
+
+            if ($request->filled('customer_id')) {
+                $query->where('customer_id', $request->customer_id);
+            }
+
+            $data = $query->latest('tanggal_invoice')->paginate(15)->withQueryString();
         }
 
-        $jobs = $query->get()->map(function ($job) {
-            return [
-                'Nomor JO' => $job->nomor_jo,
-                'Customer' => $job->customer?->nama,
-                'Status' => $job->status,
-                'Total Revenue' => $job->invoices->sum('total'),
-                'Total Cost' => $job->costs->sum('jumlah'),
-                'Profit' => $job->invoices->sum('total') - $job->costs->sum('jumlah'),
-                'Created At' => $job->created_at->format('Y-m-d'),
-            ];
-        });
-
-        return view('finance.export', compact('jobs'));
+        return view('finance.export', compact('customers', 'data'));
     }
 }
