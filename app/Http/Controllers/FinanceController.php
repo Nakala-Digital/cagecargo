@@ -89,22 +89,47 @@ class FinanceController extends Controller
         return redirect()->back()->with('success', 'Biaya berhasil dicatat.');
     }
 
-    public function profitAnalysis()
+    public function profitAnalysis(Request $request)
     {
-        $jobs = JobOrder::with('customer')
+        $customers = Customer::where('status', 'aktif')->orderBy('nama')->get();
+
+        $query = JobOrder::with('customer')
             ->whereIn('status', ['delivered', 'closed'])
             ->withSum('invoices as total_revenue', 'total')
-            ->withSum('costs as total_cost', 'jumlah')
-            ->get()
-            ->map(function ($job) {
-                $job->profit = $job->total_revenue - $job->total_cost;
-                $job->margin = $job->total_revenue > 0
-                    ? round(($job->profit / $job->total_revenue) * 100, 2)
-                    : 0;
-                return $job;
-            });
+            ->withSum('costs as total_cost', 'jumlah');
 
-        return view('finance.profit', compact('jobs'));
+        if ($request->filled('from')) {
+            $query->whereDate('created_at', '>=', $request->from);
+        }
+
+        if ($request->filled('to')) {
+            $query->whereDate('created_at', '<=', $request->to);
+        }
+
+        if ($request->filled('customer_id')) {
+            $query->where('customer_id', $request->customer_id);
+        }
+
+        $profits = $query->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $profits->getCollection()->transform(function ($job) {
+            $revenue = $job->total_revenue ?? 0;
+            $cost = $job->total_cost ?? 0;
+            $profit = $revenue - $cost;
+
+            return [
+                'nomor_jo' => $job->nomor_jo,
+                'customer' => $job->customer?->nama ?? '-',
+                'revenue' => $revenue,
+                'cost' => $cost,
+                'profit' => $profit,
+                'margin' => $revenue > 0 ? round(($profit / $revenue) * 100, 2) : 0,
+            ];
+        });
+
+        return view('finance.profit', compact('customers', 'profits'));
     }
 
     public function payment(Invoice $invoice)
