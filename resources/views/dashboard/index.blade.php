@@ -61,23 +61,23 @@
         <div class="chart-card">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-navy">Revenue vs Cost</h3>
-                <span class="text-xs text-gray-400">6 bulan terakhir</span>
+                <span class="chart-kicker">6 bulan terakhir</span>
             </div>
-            <canvas id="revenueChart" height="160"></canvas>
+            <canvas id="revenueChart" class="dashboard-chart"></canvas>
         </div>
         <div class="chart-card">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-navy">Pengeluaran</h3>
-                <span class="text-xs text-gray-400">Bulan ini</span>
+                <span class="chart-kicker">Bulan ini</span>
             </div>
-            <canvas id="pengeluaranChart" height="160"></canvas>
+            <canvas id="pengeluaranChart" class="dashboard-chart"></canvas>
         </div>
         <div class="chart-card">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-navy">Job Status</h3>
-                <span class="text-xs text-gray-400">Semua waktu</span>
+                <span class="chart-kicker">Semua waktu</span>
             </div>
-            <canvas id="jobStatusChart" height="160"></canvas>
+            <canvas id="jobStatusChart" class="dashboard-chart"></canvas>
         </div>
     </div>
 
@@ -119,7 +119,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-semibold text-navy">Kepemilikan Armada</h3>
                 </div>
-                <canvas id="armadaOwnershipChart" height="120"></canvas>
+                <canvas id="armadaOwnershipChart" class="dashboard-chart-sm"></canvas>
                 <div class="grid grid-cols-2 gap-2 mt-4">
                     <div class="text-center p-2 bg-gray-50 rounded-xl">
                         <p class="text-xs text-gray-400">Milik Sendiri</p>
@@ -299,23 +299,45 @@ const red = '#dc2626';
 const orange = '#ea580c';
 const yellow = '#ca8a04';
 const purple = '#7c3aed';
+const slate = '#64748b';
+const grid = '#e2e8f0';
+const moneyTick = value => 'Rp' + (value / 1000000).toFixed(value >= 10000000 ? 0 : 1).replace('.0', '') + 'jt';
+const rupiah = value => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+const axisStyle = {
+    x: {
+        border: { display: false },
+        grid: { display: false },
+        ticks: { color: slate, font: { size: 11, weight: 500 } }
+    },
+    y: {
+        beginAtZero: true,
+        border: { display: false },
+        grid: { color: grid, drawTicks: false },
+        ticks: { color: slate, padding: 10, font: { size: 10 }, callback: moneyTick }
+    }
+};
+const bottomLegend = {
+    position: 'bottom',
+    labels: { boxWidth: 8, boxHeight: 8, usePointStyle: true, padding: 16, color: slate, font: { size: 11, weight: 500 } }
+};
 
 new Chart(document.getElementById('revenueChart'), {
     type: 'bar',
     data: {
         labels: {!! json_encode(array_column($monthlyChart, 'bulan')) !!},
         datasets: [
-            { label: 'Revenue', data: {!! json_encode(array_column($monthlyChart, 'revenue')) !!}, backgroundColor: teal, borderRadius: 6, barPercentage: 0.6 },
-            { label: 'Cost', data: {!! json_encode(array_column($monthlyChart, 'cost')) !!}, backgroundColor: red, borderRadius: 6, barPercentage: 0.6 }
+            { label: 'Revenue', data: {!! json_encode(array_column($monthlyChart, 'revenue')) !!}, backgroundColor: teal, borderColor: '#10b8bf', borderWidth: 1, borderRadius: 10, borderSkipped: false, barPercentage: 0.7, categoryPercentage: 0.62 },
+            { label: 'Cost', data: {!! json_encode(array_column($monthlyChart, 'cost')) !!}, backgroundColor: red, borderColor: '#ef4444', borderWidth: 1, borderRadius: 10, borderSkipped: false, barPercentage: 0.7, categoryPercentage: 0.62 }
         ]
     },
     options: {
         responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true, padding: 12, font: { size: 10 } } } },
-        scales: {
-            x: { grid: { display: false }, ticks: { font: { size: 9 } } },
-            y: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { font: { size: 9 }, callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } }
-        }
+        interaction: { intersect: false, mode: 'index' },
+        plugins: {
+            legend: bottomLegend,
+            tooltip: { callbacks: { label: context => `${context.dataset.label}: ${rupiah(context.parsed.y)}` } }
+        },
+        scales: axisStyle
     }
 });
 
@@ -326,13 +348,14 @@ if (pengeluaranData.length) {
         type: 'doughnut',
         data: {
             labels: pengeluaranLabels,
-            datasets: [{ data: pengeluaranData, backgroundColor: [teal, navy, orange, green, red, yellow, purple, '#ec4899', '#06b6d4', '#84cc16'] }]
+            datasets: [{ data: pengeluaranData, backgroundColor: [teal, navy, orange, green, red, yellow, purple, '#ec4899', '#06b6d4', '#84cc16'], borderColor: '#ffffff', borderWidth: 4, hoverOffset: 8 }]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            cutout: '65%',
+            cutout: '68%',
             plugins: {
-                legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true, padding: 10, font: { size: 9 } } }
+                legend: bottomLegend,
+                tooltip: { callbacks: { label: context => `${context.label}: ${rupiah(context.parsed)}` } }
             }
         }
     });
@@ -344,13 +367,13 @@ if (statusData.some(v => v > 0)) {
         type: 'doughnut',
         data: {
             labels: {!! json_encode(array_keys($statusCounts)) !!},
-            datasets: [{ data: statusData, backgroundColor: ['#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444', '#f97316', '#10b981', '#6b7280'] }]
+            datasets: [{ data: statusData, backgroundColor: ['#2563eb', '#f59e0b', '#8b5cf6', '#ef4444', '#f97316', '#10b981', '#6b7280'], borderColor: '#ffffff', borderWidth: 4, hoverOffset: 8 }]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            cutout: '65%',
+            cutout: '68%',
             plugins: {
-                legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true, padding: 10, font: { size: 9 } } }
+                legend: bottomLegend
             }
         }
     });
@@ -363,16 +386,18 @@ new Chart(document.getElementById('armadaOwnershipChart'), {
         datasets: [{
             data: [{{ $milikSendiri }}, {{ $subkonArmada }}, {{ $subkonDriver }}, {{ $subkonKeduanya }}],
             backgroundColor: [navy, teal, orange, green],
-            borderRadius: 6,
-            barPercentage: 0.5
+            borderRadius: 10,
+            borderSkipped: false,
+            barPercentage: 0.58,
+            categoryPercentage: 0.72
         }]
     },
     options: {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-            x: { grid: { display: false }, ticks: { font: { size: 9 } } },
-            y: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { stepSize: 1, font: { size: 9 } } }
+            x: axisStyle.x,
+            y: { ...axisStyle.y, ticks: { color: slate, stepSize: 1, padding: 10, font: { size: 10 } } }
         }
     }
 });
