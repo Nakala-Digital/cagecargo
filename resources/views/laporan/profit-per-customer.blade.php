@@ -20,6 +20,17 @@
         <a href="{{ route('laporan.profit-per-customer') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Reset</a>
     </form>
 
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-navy mb-4">Top 10 Customer by Profit</h3>
+            <canvas id="profitBarChart" height="250"></canvas>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-navy mb-4">Top 10 Revenue</h3>
+            <canvas id="revenueBarChart" height="250"></canvas>
+        </div>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
         <table class="w-full">
             <thead>
@@ -50,3 +61,50 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+const topCustomers = @json($customers->take(10)->values());
+const labels = topCustomers.map(r => r.c.nama.length > 15 ? r.c.nama.substring(0, 15) + '..' : r.c.nama);
+const profits = topCustomers.map(r => r.profit);
+const revenues = topCustomers.map(r => r.revenue);
+
+new Chart(document.getElementById('profitBarChart'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Profit',
+            data: profits,
+            backgroundColor: profits.map(v => v >= 0 ? '#059669' : '#dc2626'),
+            borderRadius: 4
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true, ticks: { callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } } }
+    }
+});
+
+new Chart(document.getElementById('revenueBarChart'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Revenue',
+            data: revenues,
+            backgroundColor: '#07979E',
+            borderRadius: 4
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true, ticks: { callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } } }
+    }
+});
+</script>
+@endpush

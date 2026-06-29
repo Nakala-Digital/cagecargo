@@ -23,6 +23,11 @@
         @endforeach
     </div>
 
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <h3 class="text-sm font-semibold text-navy mb-4">Distribusi Aging {{ $type == 'ar' ? 'AR (Piutang)' : 'AP (Utang)' }}</h3>
+        <canvas id="agingChart" height="160"></canvas>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
         <table class="w-full">
             <thead>
@@ -66,3 +71,25 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+new Chart(document.getElementById('agingChart'), {
+    type: 'bar',
+    data: {
+        labels: ['0-30 Hari', '31-60 Hari', '61-90 Hari', '90+ Hari'],
+        datasets: [{
+            label: 'Total',
+            data: [{{ $aging['0-30']['total'] }}, {{ $aging['31-60']['total'] }}, {{ $aging['61-90']['total'] }}, {{ $aging['90+']['total'] }}],
+            backgroundColor: ['#059669', '#ca8a04', '#ea580c', '#dc2626'],
+            borderRadius: 6
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } } }
+    }
+});
+</script>
+@endpush

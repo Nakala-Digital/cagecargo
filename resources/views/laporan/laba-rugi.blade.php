@@ -41,6 +41,17 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-navy mb-4">Revenue vs Cost</h3>
+            <canvas id="plBarChart" height="160"></canvas>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-navy mb-4">Komposisi Biaya</h3>
+            <canvas id="plPieChart" height="160"></canvas>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow-sm p-6">
             <h3 class="text-lg font-semibold text-navy mb-4">Rincian Biaya (per Tipe)</h3>
             <div class="space-y-2">
                 @forelse($costByType as $tipe => $total)
@@ -69,3 +80,50 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+const teal = '#07979E';
+const red = '#dc2626';
+const green = '#059669';
+
+new Chart(document.getElementById('plBarChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Revenue', 'Cost', 'Profit'],
+        datasets: [{
+            data: [{{ $revenue }}, {{ $totalCost }}, {{ $profit }}],
+            backgroundColor: [green, red, '{{ $profit >= 0 ? green : red }}'],
+            borderRadius: 6
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } } }
+    }
+});
+
+const costLabels = [];
+const costData = [];
+@foreach($costByType as $tipe => $total)
+costLabels.push('{{ str_replace("_", " ", ucwords($tipe)) }}');
+costData.push({{ $total }});
+@endforeach
+@foreach($pengeluaranByType as $jenis => $total)
+costLabels.push('Peng: {{ str_replace("_", " ", ucwords($jenis)) }}');
+costData.push({{ $total }});
+@endforeach
+
+if (costData.length) {
+    new Chart(document.getElementById('plPieChart'), {
+        type: 'pie',
+        data: {
+            labels: costLabels,
+            datasets: [{ data: costData, backgroundColor: [teal, red, green, '#ea580c', '#ca8a04', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } } }
+    });
+}
+</script>
+@endpush

@@ -20,6 +20,11 @@
         <a href="{{ route('laporan.profit-per-driver') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Reset</a>
     </form>
 
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <h3 class="text-sm font-semibold text-navy mb-4">Top 10 Driver by Profit</h3>
+        <canvas id="profitBarChart" height="250"></canvas>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
         <table class="w-full">
             <thead>
@@ -50,3 +55,30 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+const topDrivers = @json($drivers->take(10)->values());
+const labels = topDrivers.map(r => (r.d.nama || '').length > 15 ? (r.d.nama || '').substring(0, 15) + '..' : (r.d.nama || ''));
+const profits = topDrivers.map(r => r.profit);
+
+new Chart(document.getElementById('profitBarChart'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Profit',
+            data: profits,
+            backgroundColor: profits.map(v => v >= 0 ? '#059669' : '#dc2626'),
+            borderRadius: 4
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true, ticks: { callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } } }
+    }
+});
+</script>
+@endpush

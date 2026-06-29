@@ -38,6 +38,17 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-navy mb-4">Cash In vs Cash Out</h3>
+            <canvas id="cfBarChart" height="160"></canvas>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-navy mb-4">Cash In by Metode</h3>
+            <canvas id="cfPieChart" height="160"></canvas>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow-sm p-6">
             <h3 class="text-lg font-semibold text-green-700 mb-4">Cash In Detail</h3>
             <div class="space-y-2">
                 @forelse($cashInByMetode as $metode => $total)
@@ -74,3 +85,37 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+new Chart(document.getElementById('cfBarChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Cash In', 'Cash Out', 'Net Cash'],
+        datasets: [{
+            data: [{{ $cashIn }}, {{ $cashOut }}, {{ $netCash }}],
+            backgroundColor: ['#059669', '#dc2626', '{{ $netCash >= 0 ? '#07979E' : '#dc2626' }}'],
+            borderRadius: 6
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } } }
+    }
+});
+
+const metodeLabels = {!! json_encode($cashInByMetode->keys()->map(fn($m) => ucwords(str_replace('_', ' ', $m)))->values()) !!};
+const metodeData = {!! json_encode($cashInByMetode->values()) !!};
+if (metodeData.length) {
+    new Chart(document.getElementById('cfPieChart'), {
+        type: 'pie',
+        data: {
+            labels: metodeLabels,
+            datasets: [{ data: metodeData, backgroundColor: ['#07979E', '#059669', '#022864', '#ea580c', '#8b5cf6', '#06b6d4'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } } }
+    });
+}
+</script>
+@endpush

@@ -14,6 +14,8 @@ use App\Models\ArArmada;
 use App\Models\BudgetArmada;
 use App\Models\DokumenArmada;
 use App\Models\DokumenIzin;
+use App\Models\Invoice;
+use App\Models\Cost;
 
 class DashboardController extends Controller
 {
@@ -41,7 +43,15 @@ class DashboardController extends Controller
                 })->count(),
             'dokumen_expiring' => DokumenArmada::whereBetween('tanggal_expired', [now(), now()->addDays(30)])->count(),
             'izin_expiring' => DokumenIzin::whereBetween('masa_berlaku', [now(), now()->addDays(30)])->count(),
+            'total_revenue_bulan' => Invoice::whereMonth('tanggal_invoice', now()->month)
+                ->whereYear('tanggal_invoice', now()->year)->sum('total'),
+            'total_cost_bulan' => Cost::whereMonth('tanggal', now()->month)
+                ->whereYear('tanggal', now()->year)->sum('jumlah')
+                + PengeluaranArmada::whereMonth('tanggal', now()->month)
+                    ->whereYear('tanggal', now()->year)->sum('jumlah'),
         ];
+
+        $stats['profit_bulan'] = $stats['total_revenue_bulan'] - $stats['total_cost_bulan'];
 
         $recentJobs = JobOrder::with(['customer', 'armada', 'driver'])
             ->latest()
@@ -77,9 +87,42 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Chart data: monthly revenue/cost for last 6 months
+        $monthlyChart = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $m = now()->subMonths($i);
+            $rev = Invoice::whereMonth('tanggal_invoice', $m->month)
+                ->whereYear('tanggal_invoice', $m->year)->sum('total');
+            $cst = Cost::whereMonth('tanggal', $m->month)
+                ->whereYear('tanggal', $m->year)->sum('jumlah')
+                + PengeluaranArmada::whereMonth('tanggal', $m->month)
+                    ->whereYear('tanggal', $m->year)->sum('jumlah');
+            $monthlyChart[] = [
+                'bulan' => $m->format('M Y'),
+                'revenue' => $rev,
+                'cost' => $cst,
+                'profit' => $rev - $cst,
+            ];
+        }
+
+        // Chart data: job order status distribution
+        $statusLabels = ['assigned', 'pickup', 'gate_in', 'customs', 'on_delivery', 'delivered', 'closed'];
+        $statusCounts = [];
+        foreach ($statusLabels as $s) {
+            $statusCounts[$s] = JobOrder::where('status', $s)->count();
+        }
+
+        // Chart data: armada kepemilikan distribution
+        $milikSendiri = Armada::where('jenis_kepemilikan', 'milik_sendiri')->count();
+        $subkonArmada = Armada::where('jenis_kepemilikan', 'subkon_armada')->count();
+        $subkonDriver = Armada::where('jenis_kepemilikan', 'subkon_driver')->count();
+        $subkonKeduanya = Armada::where('jenis_kepemilikan', 'subkon_keduanya')->count();
+
         return view('dashboard.index', compact(
             'stats', 'recentJobs', 'recentSuratJalan', 'pengeluaranBulanIni',
-            'dokumenAkanExpired', 'izinAkanExpired', 'serviceAlerts'
+            'dokumenAkanExpired', 'izinAkanExpired', 'serviceAlerts',
+            'monthlyChart', 'statusCounts',
+            'milikSendiri', 'subkonArmada', 'subkonDriver', 'subkonKeduanya'
         ));
     }
 }
