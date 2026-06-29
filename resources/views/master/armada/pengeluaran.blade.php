@@ -13,7 +13,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-xl shadow-sm p-6">
             <h3 class="text-lg font-semibold text-navy mb-4">Tambah Pengeluaran</h3>
-            <form method="POST" action="{{ route('master.armada.pengeluaran.store', $armada) }}">
+            <form method="POST" action="{{ route('master.armada.pengeluaran.store', $armada) }}" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Jenis *</label>
@@ -59,6 +59,11 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
                     <textarea name="keterangan" rows="2" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-teal focus:border-teal">{{ old('keterangan') }}</textarea>
                 </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Bukti (nota/foto)</label>
+                    <input type="file" name="bukti" accept="image/*,application/pdf" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-teal focus:border-teal">
+                    <p class="text-xs text-gray-400 mt-1">Maks 5 MB. Format: JPG, PNG, PDF</p>
+                </div>
                 <button type="submit" class="w-full px-4 py-2.5 bg-teal text-white rounded-lg hover:bg-teal-600 font-medium">Simpan Pengeluaran</button>
             </form>
         </div>
@@ -75,6 +80,9 @@
                             <p class="text-xs text-gray-500">{{ $p->tanggal?->format('d M Y') }}</p>
                             @if($p->lokasi)<p class="text-xs text-gray-400">{{ $p->lokasi }}</p>@endif
                             @if($p->keterangan)<p class="text-xs text-gray-400 mt-1">{{ $p->keterangan }}</p>@endif
+                            @if($p->bukti)
+                            <a href="{{ asset('storage/' . $p->bukti) }}" target="_blank" class="text-xs text-teal hover:text-teal-600 mt-1 inline-block">Lihat Bukti</a>
+                            @endif
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-semibold text-navy">Rp {{ number_format($p->jumlah, 0, ',', '.') }}</p>

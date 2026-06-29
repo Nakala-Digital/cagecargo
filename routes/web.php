@@ -19,6 +19,9 @@ use App\Http\Controllers\PengeluaranArmadaController;
 use App\Http\Controllers\ApArController;
 use App\Http\Controllers\MasterArmadaController;
 use App\Http\Controllers\DemoIntegrationController;
+use App\Http\Controllers\UangJalanController;
+use App\Http\Controllers\MaintenanceArmadaController;
+use App\Http\Controllers\LaporanController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -83,6 +86,17 @@ Route::middleware('auth')->group(function () {
         Route::get('pengeluaran', [PengeluaranArmadaController::class, 'index'])->name('pengeluaran.index');
         Route::post('pengeluaran/{pengeluaran}/approve', [PengeluaranArmadaController::class, 'approve'])->name('pengeluaran.approve');
         Route::post('pengeluaran/{pengeluaran}/reject', [PengeluaranArmadaController::class, 'reject'])->name('pengeluaran.reject');
+
+        Route::get('uang-jalan', [UangJalanController::class, 'index'])->name('uang-jalan.index');
+        Route::get('uang-jalan/create', [UangJalanController::class, 'create'])->name('uang-jalan.create');
+        Route::post('uang-jalan', [UangJalanController::class, 'store'])->name('uang-jalan.store');
+        Route::get('uang-jalan/{uangJalan}', [UangJalanController::class, 'show'])->name('uang-jalan.show');
+        Route::post('uang-jalan/{uangJalan}/approve', [UangJalanController::class, 'approve'])->name('uang-jalan.approve');
+
+        Route::get('maintenance', [MaintenanceArmadaController::class, 'index'])->name('maintenance.index');
+        Route::get('maintenance/create', [MaintenanceArmadaController::class, 'create'])->name('maintenance.create');
+        Route::post('maintenance', [MaintenanceArmadaController::class, 'store'])->name('maintenance.store');
+        Route::get('maintenance/{maintenance}', [MaintenanceArmadaController::class, 'show'])->name('maintenance.show');
     });
 
     Route::prefix('finance')->name('finance.')->group(function () {
@@ -106,5 +120,24 @@ Route::middleware('auth')->group(function () {
         Route::get('ar/create', [ApArController::class, 'arCreate'])->name('ar.create');
         Route::post('ar', [ApArController::class, 'arStore'])->name('ar.store');
         Route::post('ar/{ar}/pay', [ApArController::class, 'arPay'])->name('ar.pay');
+    });
+
+    Route::prefix('laporan')->name('laporan.')->group(function () {
+        Route::get('aging', [LaporanController::class, 'aging'])->name('aging');
+        Route::get('outstanding', [LaporanController::class, 'outstanding'])->name('outstanding');
+        Route::get('reminder', [LaporanController::class, 'reminder'])->name('reminder');
+        Route::get('laba-rugi', [LaporanController::class, 'labaRugi'])->name('laba-rugi');
+        Route::get('neraca', [LaporanController::class, 'neraca'])->name('neraca');
+        Route::get('cash-flow', [LaporanController::class, 'cashFlow'])->name('cash-flow');
+        Route::get('profit-per-customer', [LaporanController::class, 'profitPerCustomer'])->name('profit-per-customer');
+        Route::get('profit-per-armada', [LaporanController::class, 'profitPerArmada'])->name('profit-per-armada');
+        Route::get('profit-per-driver', [LaporanController::class, 'profitPerDriver'])->name('profit-per-driver');
+
+        Route::get('closing', [LaporanController::class, 'closingIndex'])->name('closing.index');
+        Route::get('closing/create', [LaporanController::class, 'closingCreate'])->name('closing.create');
+        Route::post('closing', [LaporanController::class, 'closingStore'])->name('closing.store');
+        Route::get('closing/{closing}', [LaporanController::class, 'closingShow'])->name('closing.show');
+
+        Route::get('export-pdf/{type}', [LaporanController::class, 'exportPdf'])->name('export-pdf');
     });
 });

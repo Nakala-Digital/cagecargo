@@ -13,7 +13,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-xl shadow-sm p-6">
             <h3 class="text-lg font-semibold text-navy mb-4">Tambah Perijinan</h3>
-            <form method="POST" action="{{ route('master.armada.izin.store', $armada) }}">
+            <form method="POST" action="{{ route('master.armada.izin.store', $armada) }}" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Perijinan *</label>
@@ -61,6 +61,11 @@
                     <textarea name="keterangan" rows="2" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-teal focus:border-teal">{{ old('keterangan') }}</textarea>
                 </div>
                 <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">File Izin</label>
+                    <input type="file" name="file_izin" accept="image/*,application/pdf" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-teal focus:border-teal">
+                    <p class="text-xs text-gray-400 mt-1">Maks 5 MB. Format: JPG, PNG, PDF</p>
+                </div>
+                <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                     <select name="status" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-teal focus:border-teal">
                         <option value="aktif" {{ old('status', 'aktif') == 'aktif' ? 'selected' : '' }}>Aktif</option>
@@ -88,6 +93,9 @@
                                 <span>Exp: {{ $i->masa_berlaku?->format('d M Y') ?? '-' }}</span>
                             </div>
                             @if($i->keterangan)<p class="text-xs text-gray-400 mt-1">{{ $i->keterangan }}</p>@endif
+                            @if($i->file_izin)
+                            <a href="{{ asset('storage/' . $i->file_izin) }}" target="_blank" class="text-xs text-teal hover:text-teal-600 mt-1 inline-block">Lihat File</a>
+                            @endif
                         </div>
                         <div class="text-right">
                             <span class="text-xs px-1.5 py-0.5 rounded-full {{ $i->status == 'aktif' ? 'bg-green-100 text-green-700' : ($i->status == 'expired' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700') }}">{{ $i->status }}</span>

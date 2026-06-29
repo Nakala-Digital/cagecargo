@@ -69,6 +69,16 @@ class Armada extends Model
         return $this->hasMany(SuratJalan::class);
     }
 
+    public function uangJalan()
+    {
+        return $this->hasMany(UangJalan::class);
+    }
+
+    public function maintenance()
+    {
+        return $this->hasMany(MaintenanceArmada::class);
+    }
+
     public function pengeluaran()
     {
         return $this->hasMany(PengeluaranArmada::class);

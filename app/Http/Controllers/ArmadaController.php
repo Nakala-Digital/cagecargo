@@ -12,9 +12,12 @@ use App\Models\BudgetArmada;
 use App\Models\SuratJalan;
 use App\Models\ApArmada;
 use App\Models\ArArmada;
+use App\Traits\HasFileUpload;
 use Illuminate\Http\Request;
 
 class ArmadaController extends Controller
+{
+    use HasFileUpload;
 {
     public function index()
     {
@@ -137,9 +140,11 @@ class ArmadaController extends Controller
             'driver_id' => 'nullable|exists:drivers,id',
             'job_order_id' => 'nullable|exists:job_orders,id',
             'keterangan' => 'nullable',
+            'bukti' => 'nullable|file|max:5120',
         ]);
 
         $validated['armada_id'] = $armada->id;
+        $validated['bukti'] = $this->uploadFile($request, 'bukti', 'uploads/pengeluaran');
         PengeluaranArmada::create($validated);
 
         // Update level solar jika pengisian solar
@@ -195,8 +200,10 @@ class ArmadaController extends Controller
             'biaya_perpanjangan' => 'nullable|numeric',
             'sticker_number' => 'nullable',
             'keterangan' => 'nullable',
+            'file_izin' => 'nullable|file|max:5120',
         ]);
 
+        $validated['file_izin'] = $this->uploadFile($request, 'file_izin', 'uploads/izin');
         $armada->izin()->create($validated);
 
         return redirect()->back()->with('success', 'Data izin berhasil ditambahkan.');
