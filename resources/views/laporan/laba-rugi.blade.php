@@ -93,12 +93,12 @@ new Chart(document.getElementById('plBarChart'), {
         labels: ['Revenue', 'Cost', 'Profit'],
         datasets: [{
             data: [{{ $revenue }}, {{ $totalCost }}, {{ $profit }}],
-            backgroundColor: [green, red, '{{ $profit >= 0 ? green : red }}'],
+            backgroundColor: [green, red, '{{ $profit >= 0 ? '#059669' : '#dc2626' }}'],
             borderRadius: 6
         }]
     },
     options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: true,
         plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } } }
     }
@@ -122,7 +122,7 @@ if (costData.length) {
             labels: costLabels,
             datasets: [{ data: costData, backgroundColor: [teal, red, green, '#ea580c', '#ca8a04', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'] }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } } }
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } } }
     });
 }
 </script>

@@ -63,21 +63,21 @@
                 <h3 class="text-sm font-semibold text-navy">Revenue vs Cost</h3>
                 <span class="chart-kicker">6 bulan terakhir</span>
             </div>
-            <canvas id="revenueChart" class="dashboard-chart"></canvas>
+            <canvas id="revenueChart" height="140"></canvas>
         </div>
         <div class="chart-card">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-navy">Pengeluaran</h3>
                 <span class="chart-kicker">Bulan ini</span>
             </div>
-            <canvas id="pengeluaranChart" class="dashboard-chart"></canvas>
+            <canvas id="pengeluaranChart" height="140"></canvas>
         </div>
         <div class="chart-card">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-navy">Job Status</h3>
                 <span class="chart-kicker">Semua waktu</span>
             </div>
-            <canvas id="jobStatusChart" class="dashboard-chart"></canvas>
+            <canvas id="jobStatusChart" height="140"></canvas>
         </div>
     </div>
 
@@ -119,7 +119,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-semibold text-navy">Kepemilikan Armada</h3>
                 </div>
-                <canvas id="armadaOwnershipChart" class="dashboard-chart-sm"></canvas>
+                <canvas id="armadaOwnershipChart" height="100"></canvas>
                 <div class="grid grid-cols-2 gap-2 mt-4">
                     <div class="text-center p-2 bg-gray-50 rounded-xl">
                         <p class="text-xs text-gray-400">Milik Sendiri</p>
@@ -331,7 +331,7 @@ new Chart(document.getElementById('revenueChart'), {
         ]
     },
     options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: true,
         interaction: { intersect: false, mode: 'index' },
         plugins: {
             legend: bottomLegend,
@@ -351,7 +351,7 @@ if (pengeluaranData.length) {
             datasets: [{ data: pengeluaranData, backgroundColor: [teal, navy, orange, green, red, yellow, purple, '#ec4899', '#06b6d4', '#84cc16'], borderColor: '#ffffff', borderWidth: 4, hoverOffset: 8 }]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: true,
             cutout: '68%',
             plugins: {
                 legend: bottomLegend,
@@ -370,7 +370,7 @@ if (statusData.some(v => v > 0)) {
             datasets: [{ data: statusData, backgroundColor: ['#2563eb', '#f59e0b', '#8b5cf6', '#ef4444', '#f97316', '#10b981', '#6b7280'], borderColor: '#ffffff', borderWidth: 4, hoverOffset: 8 }]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: true,
             cutout: '68%',
             plugins: {
                 legend: bottomLegend
@@ -393,7 +393,7 @@ new Chart(document.getElementById('armadaOwnershipChart'), {
         }]
     },
     options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: true,
         plugins: { legend: { display: false } },
         scales: {
             x: axisStyle.x,

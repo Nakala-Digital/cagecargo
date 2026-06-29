@@ -86,7 +86,7 @@ new Chart(document.getElementById('agingChart'), {
         }]
     },
     options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: true,
         plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } } }
     }

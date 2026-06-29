@@ -75,7 +75,7 @@ new Chart(document.getElementById('profitBarChart'), {
     },
     options: {
         indexAxis: 'y',
-        responsive: true, maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: true,
         plugins: { legend: { display: false } },
         scales: { x: { beginAtZero: true, ticks: { callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } } }
     }

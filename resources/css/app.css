@@ -64,14 +64,6 @@ body {
 .chart-card canvas {
     @apply block w-full;
 }
-.dashboard-chart {
-    height: 190px !important;
-    max-height: 190px;
-}
-.dashboard-chart-sm {
-    height: 135px !important;
-    max-height: 135px;
-}
 .chart-kicker {
     @apply rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-500;
 }

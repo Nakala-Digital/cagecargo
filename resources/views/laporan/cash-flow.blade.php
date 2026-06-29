@@ -99,7 +99,7 @@ new Chart(document.getElementById('cfBarChart'), {
         }]
     },
     options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: true,
         plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { callback: v => 'Rp' + (v/1000000).toFixed(0) + 'jt' } } }
     }
@@ -114,7 +114,7 @@ if (metodeData.length) {
             labels: metodeLabels,
             datasets: [{ data: metodeData, backgroundColor: ['#07979E', '#059669', '#022864', '#ea580c', '#8b5cf6', '#06b6d4'] }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } } }
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } } }
     });
 }
 </script>
