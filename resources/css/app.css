@@ -35,3 +35,58 @@
 body {
     font-family: 'Poppins', sans-serif;
 }
+
+.stat-card {
+    @apply relative overflow-hidden rounded-2xl p-5 transition-all duration-300;
+}
+.stat-card:hover {
+    @apply -translate-y-0.5 shadow-lg;
+}
+.stat-card .stat-icon {
+    @apply absolute right-3 top-3 opacity-10;
+}
+.stat-card .stat-icon svg {
+    @apply w-16 h-16;
+}
+
+.chart-card {
+    @apply bg-white rounded-2xl shadow-sm p-5 border border-gray-100/50 transition-all duration-300;
+}
+.chart-card:hover {
+    @apply shadow-md border-gray-200;
+}
+
+.table-card {
+    @apply bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100/50;
+}
+
+.reminder-item {
+    @apply flex items-center gap-3 p-3 rounded-xl transition-all duration-200;
+}
+.reminder-item:hover {
+    @apply bg-gray-50;
+}
+
+.gradient-navy {
+    background: linear-gradient(135deg, #022864 0%, #1a3a7a 100%);
+}
+.gradient-teal {
+    background: linear-gradient(135deg, #07979E 0%, #06787e 100%);
+}
+.gradient-green {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+.gradient-orange {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+}
+.gradient-purple {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+}
+.gradient-pink {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+}
+
+.badge {
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full;
+}
+
