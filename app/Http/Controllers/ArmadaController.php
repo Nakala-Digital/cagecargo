@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 class ArmadaController extends Controller
 {
     use HasFileUpload;
-{
+
     public function index()
     {
         $armadas = Armada::with(['vendor', 'jenisArmada', 'kontrak'])->latest()->paginate(10);
